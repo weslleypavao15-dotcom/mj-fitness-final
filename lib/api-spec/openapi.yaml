@@ -14,6 +14,8 @@ tags:
     description: Student management
   - name: stats
     description: Dashboard statistics
+  - name: payments
+    description: Financial payment records
 paths:
   /healthz:
     get:
@@ -113,6 +115,69 @@ paths:
               schema:
                 $ref: "#/components/schemas/GymStats"
 
+  /payments:
+    get:
+      operationId: listPayments
+      tags: [payments]
+      summary: List all payment records
+      responses:
+        "200":
+          description: List of payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+    post:
+      operationId: createPayment
+      tags: [payments]
+      summary: Register a new payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentInput"
+      responses:
+        "201":
+          description: Payment registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payments/{id}:
+    delete:
+      operationId: deletePayment
+      tags: [payments]
+      summary: Delete a payment record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payment deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Payment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -154,15 +219,57 @@ components:
           type: string
           format: date
 
+    Payment:
+      type: object
+      required: [id, studentId, studentName, amount, paymentDate, status, createdAt]
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        studentName:
+          type: string
+        amount:
+          type: number
+        paymentDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [Pago, Atrasado]
+        createdAt:
+          type: string
+
+    PaymentInput:
+      type: object
+      required: [studentId, amount, paymentDate, status]
+      properties:
+        studentId:
+          type: integer
+        amount:
+          type: number
+        paymentDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [Pago, Atrasado]
+
     GymStats:
       type: object
-      required: [totalStudents, activeEnrollments, annualPlans]
+      required: [totalStudents, activeEnrollments, annualPlans, monthlyRevenue, paidCount, overdueCount]
       properties:
         totalStudents:
           type: integer
         activeEnrollments:
           type: integer
         annualPlans:
+          type: integer
+        monthlyRevenue:
+          type: number
+        paidCount:
+          type: integer
+        overdueCount:
           type: integer
 
     SuccessResponse:

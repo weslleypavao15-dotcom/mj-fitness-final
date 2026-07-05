@@ -14,7 +14,6 @@ export function getDb(): ReturnType<typeof Database> {
   _db.pragma("journal_mode = WAL");
   _db.pragma("foreign_keys = ON");
 
-  // Create tables if they don't exist
   _db.exec(`
     CREATE TABLE IF NOT EXISTS students (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,7 +21,16 @@ export function getDb(): ReturnType<typeof Database> {
       plan TEXT NOT NULL CHECK(plan IN ('Plano Mensal', 'Plano Trimestral', 'Plano Anual')),
       enrollment_date TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    )
+    );
+
+    CREATE TABLE IF NOT EXISTS payments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+      amount REAL NOT NULL,
+      payment_date TEXT NOT NULL,
+      status TEXT NOT NULL CHECK(status IN ('Pago', 'Atrasado')),
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
 
   return _db;

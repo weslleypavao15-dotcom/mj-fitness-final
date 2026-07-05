@@ -42,10 +42,46 @@ export interface StudentInput {
   enrollmentDate: string;
 }
 
+export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
+
+
+export const PaymentStatus = {
+  Pago: 'Pago',
+  Atrasado: 'Atrasado',
+} as const;
+
+export interface Payment {
+  id: number;
+  studentId: number;
+  studentName: string;
+  amount: number;
+  paymentDate: string;
+  status: PaymentStatus;
+  createdAt: string;
+}
+
+export type PaymentInputStatus = typeof PaymentInputStatus[keyof typeof PaymentInputStatus];
+
+
+export const PaymentInputStatus = {
+  Pago: 'Pago',
+  Atrasado: 'Atrasado',
+} as const;
+
+export interface PaymentInput {
+  studentId: number;
+  amount: number;
+  paymentDate: string;
+  status: PaymentInputStatus;
+}
+
 export interface GymStats {
   totalStudents: number;
   activeEnrollments: number;
   annualPlans: number;
+  monthlyRevenue: number;
+  paidCount: number;
+  overdueCount: number;
 }
 
 export interface SuccessResponse {

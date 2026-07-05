@@ -71,7 +71,58 @@ export const DeleteStudentResponse = zod.object({
 export const GetStatsResponse = zod.object({
   "totalStudents": zod.number(),
   "activeEnrollments": zod.number(),
-  "annualPlans": zod.number()
+  "annualPlans": zod.number(),
+  "monthlyRevenue": zod.number(),
+  "paidCount": zod.number(),
+  "overdueCount": zod.number()
+})
+
+
+/**
+ * @summary List all payment records
+ */
+export const ListPaymentsResponseItem = zod.object({
+  "id": zod.number(),
+  "studentId": zod.number(),
+  "studentName": zod.string(),
+  "amount": zod.number(),
+  "paymentDate": zod.coerce.date(),
+  "status": zod.enum(['Pago', 'Atrasado']),
+  "createdAt": zod.string()
+})
+export const ListPaymentsResponse = zod.array(ListPaymentsResponseItem)
+
+
+/**
+ * @summary Register a new payment
+ */
+export const CreatePaymentBody = zod.object({
+  "studentId": zod.number(),
+  "amount": zod.number(),
+  "paymentDate": zod.coerce.date(),
+  "status": zod.enum(['Pago', 'Atrasado'])
+})
+
+export const CreatePaymentResponse = zod.object({
+  "id": zod.number(),
+  "studentId": zod.number(),
+  "studentName": zod.string(),
+  "amount": zod.number(),
+  "paymentDate": zod.coerce.date(),
+  "status": zod.enum(['Pago', 'Atrasado']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a payment record
+ */
+export const DeletePaymentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeletePaymentResponse = zod.object({
+  "message": zod.string()
 })
 
 

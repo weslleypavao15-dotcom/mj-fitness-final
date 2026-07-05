@@ -27,10 +27,38 @@ router.get("/stats", (_req, res) => {
       .get() as { count: number }
   ).count;
 
+  // Monthly revenue = sum of all "Pago" payments this calendar month
+  const monthlyRevenue = (
+    db
+      .prepare(
+        `SELECT COALESCE(SUM(amount), 0) as total FROM payments
+         WHERE status = 'Pago'
+           AND strftime('%Y-%m', payment_date) = strftime('%Y-%m', 'now')`
+      )
+      .get() as { total: number }
+  ).total;
+
+  // Total paid payments
+  const paidCount = (
+    db
+      .prepare("SELECT COUNT(*) as count FROM payments WHERE status = 'Pago'")
+      .get() as { count: number }
+  ).count;
+
+  // Total overdue payments
+  const overdueCount = (
+    db
+      .prepare("SELECT COUNT(*) as count FROM payments WHERE status = 'Atrasado'")
+      .get() as { count: number }
+  ).count;
+
   res.json({
     totalStudents,
     activeEnrollments,
     annualPlans,
+    monthlyRevenue,
+    paidCount,
+    overdueCount,
   });
 });
 

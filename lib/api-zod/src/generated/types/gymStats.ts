@@ -10,4 +10,7 @@ export interface GymStats {
   totalStudents: number;
   activeEnrollments: number;
   annualPlans: number;
+  monthlyRevenue: number;
+  paidCount: number;
+  overdueCount: number;
 }
