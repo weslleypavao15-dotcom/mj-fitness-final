@@ -1,14 +1,13 @@
-import { Router, type IRouter } from "express";
-import healthRouter from "./health";
-import studentsRouter from "./students";
-import statsRouter from "./stats";
+import { Router } from "express";
 import historicoRouter from "./historico";
+import statsRouter from "./stats";
+import studentsRouter from "./students";
 
-const router: IRouter = Router();
+const router = Router();
 
-router.use(healthRouter);
-router.use(studentsRouter);
-router.use(statsRouter);
-router.use(historicoRouter);
+// Conectando os módulos às rotas
+router.use("/historico", historicoRouter);
+router.use("/stats", statsRouter);
+router.use("/students", studentsRouter);
 
 export default router;
