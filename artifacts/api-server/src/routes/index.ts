@@ -1,13 +1,8 @@
-import { Router } from "express";
-import historicoRouter from "./historico";
-import statsRouter from "./stats";
-import studentsRouter from "./students";
+import app from "./app";
 
-const router = Router();
+// O Render fornece a variável de ambiente PORT, caso contrário usamos a 3000
+const PORT = process.env.PORT || 3000;
 
-// Conectando os módulos às rotas
-router.use("/historico", historicoRouter);
-router.use("/stats", statsRouter);
-router.use("/students", studentsRouter);
-
-export default router;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
