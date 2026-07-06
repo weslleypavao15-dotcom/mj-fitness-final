@@ -3,7 +3,7 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: Gym Manager API
+  description: MJ Fitness API
 servers:
   - url: /api
     description: Base API path
@@ -14,15 +14,14 @@ tags:
     description: Student management
   - name: stats
     description: Dashboard statistics
-  - name: payments
-    description: Financial payment records
+  - name: historico
+    description: Financial history records
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -35,8 +34,7 @@ paths:
     get:
       operationId: listStudents
       tags: [students]
-      summary: List all students
-      description: Returns all registered students
+      summary: List all students with computed status
       responses:
         "200":
           description: List of students
@@ -49,7 +47,7 @@ paths:
     post:
       operationId: createStudent
       tags: [students]
-      summary: Register a new student
+      summary: Register a new student (auto-creates initial payment entry)
       requestBody:
         required: true
         content:
@@ -88,12 +86,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SuccessResponse"
-        "400":
-          description: Invalid ID
+        "404":
+          description: Student not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+
+  /students/{id}/renovar:
+    post:
+      operationId: renewStudent
+      tags: [students]
+      summary: Renew a student subscription (extends data_vencimento by 1 month and logs payment)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RenovarInput"
+      responses:
+        "200":
+          description: Student renewed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
         "404":
           description: Student not found
           content:
@@ -106,7 +129,6 @@ paths:
       operationId: getStats
       tags: [stats]
       summary: Get dashboard statistics
-      description: Returns totals for the dashboard stat cards
       responses:
         "200":
           description: Statistics
@@ -115,68 +137,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/GymStats"
 
-  /payments:
+  /historico:
     get:
-      operationId: listPayments
-      tags: [payments]
-      summary: List all payment records
+      operationId: listHistorico
+      tags: [historico]
+      summary: List all financial history entries
       responses:
         "200":
-          description: List of payments
+          description: Financial history list
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Payment"
-    post:
-      operationId: createPayment
-      tags: [payments]
-      summary: Register a new payment
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PaymentInput"
-      responses:
-        "201":
-          description: Payment registered
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Payment"
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-
-  /payments/{id}:
-    delete:
-      operationId: deletePayment
-      tags: [payments]
-      summary: Delete a payment record
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Payment deleted
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "404":
-          description: Payment not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                  $ref: "#/components/schemas/HistoricoItem"
 
 components:
   schemas:
@@ -185,43 +159,70 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
     Student:
       type: object
-      required: [id, name, plan, enrollmentDate, createdAt]
+      required: [id, name, enrollmentDate, dataVencimento, status, createdAt]
       properties:
         id:
           type: integer
         name:
           type: string
-        plan:
+        cpf:
           type: string
-          enum: [Plano Mensal, Plano Trimestral, Plano Anual]
+        telefone:
+          type: string
+        plano:
+          type: string
+        formaPagamento:
+          type: string
         enrollmentDate:
           type: string
           format: date
+        dataVencimento:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [Em Dia, Atrasada]
         createdAt:
           type: string
 
     StudentInput:
       type: object
-      required: [name, plan, enrollmentDate]
+      required: [name, cpf, telefone, plano, formaPagamento, enrollmentDate]
       properties:
         name:
           type: string
           minLength: 1
-        plan:
+        cpf:
           type: string
-          enum: [Plano Mensal, Plano Trimestral, Plano Anual]
+          minLength: 1
+        telefone:
+          type: string
+          minLength: 1
+        plano:
+          type: string
+          minLength: 1
+        formaPagamento:
+          type: string
+          minLength: 1
         enrollmentDate:
           type: string
           format: date
 
-    Payment:
+    RenovarInput:
       type: object
-      required: [id, studentId, studentName, amount, paymentDate, status, createdAt]
+      required: [formaPagamento]
+      properties:
+        formaPagamento:
+          type: string
+          minLength: 1
+
+    HistoricoItem:
+      type: object
+      required: [id, studentId, studentName, amount, paymentDate, createdAt]
       properties:
         id:
           type: integer
@@ -234,43 +235,23 @@ components:
         paymentDate:
           type: string
           format: date
-        status:
+        formaPagamento:
           type: string
-          enum: [Pago, Atrasado]
         createdAt:
           type: string
 
-    PaymentInput:
-      type: object
-      required: [studentId, amount, paymentDate, status]
-      properties:
-        studentId:
-          type: integer
-        amount:
-          type: number
-        paymentDate:
-          type: string
-          format: date
-        status:
-          type: string
-          enum: [Pago, Atrasado]
-
     GymStats:
       type: object
-      required: [totalStudents, activeEnrollments, annualPlans, monthlyRevenue, paidCount, overdueCount]
+      required: [totalStudents, activeStudents, overdueStudents, monthlyRevenue]
       properties:
         totalStudents:
           type: integer
-        activeEnrollments:
+        activeStudents:
           type: integer
-        annualPlans:
+        overdueStudents:
           type: integer
         monthlyRevenue:
           type: number
-        paidCount:
-          type: integer
-        overdueCount:
-          type: integer
 
     SuccessResponse:
       type: object

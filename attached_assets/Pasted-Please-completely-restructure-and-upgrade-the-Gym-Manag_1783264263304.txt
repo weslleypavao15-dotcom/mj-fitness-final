@@ -1,0 +1,24 @@
+Please completely restructure and upgrade the Gym Manager application with the following integrated payment, renewal logic, and financial charts:
+
+1. INTEGRATED REGISTRATION & AUTOMATIC EXPIRED LOGIC:
+   - When registering a new student, the user only inputs "Nome do Aluno" and "Data de Matrícula".
+   - The system must assume a fixed monthly fee of R$ 100,00. 
+   - Upon successful registration, the system must automatically create an initial payment entry of R$ 100,00 into a new `historico_financeiro` database table.
+   - The student record must track an expiration date (`data_vencimento`), which is set exactly 1 month after the registration date.
+   - AUTOMATIC OVERDUE: If the current date is greater than the student's `data_vencimento`, their status must automatically display as "Atrasada" (Overdue) in red. Otherwise, display as "Em Dia" in green.
+
+2. ONE-CLICK RENEWAL BUTTON:
+   - Next to each student (either in the table or card), add a prominent "Renovar Assinatura" (Renew Subscription) button.
+   - When clicked, this button must:
+     a) Update the student's `data_vencimento` to exactly 1 month from the renewal date.
+     b) Automatically inject a new income record of R$ 100,00 into the `historico_financeiro` table.
+     c) Instantly change the student's status back to "Em Dia".
+
+3. SEPARATE FINANCIAL HISTORY & VISUAL CHART:
+   - Create a separate, dedicated section or tab for "Histórico Financeiro" below the student manager.
+   - VISUAL CHART: Integrate a beautiful bar chart or line chart (using Chart.js via CDN) that reads the `historico_financeiro` table and dynamically displays the total income (R$) that entered the business grouped by months/days.
+   - SPREADSHEET LIST: Below the chart, list all individual cash entries in a clean, scrollable spreadsheet format (Columns: Aluno, Valor [R$ 100,00], Data do Recebimento).
+
+4. MOBILE LAYOUT PROTECTION:
+   - Ensure all tables, charts, and text labels are beautifully optimized for mobile devices. The student list must be fully readable (using responsive cards or an explicit horizontally scrollable `overflow-x-auto` wrapper) so that student names and buttons never overlap or squeeze.
+   - Keep the entire user interface 100% in Portuguese.

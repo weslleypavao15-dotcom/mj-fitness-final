@@ -1,0 +1,38 @@
+Please completely overhaul and upgrade the application into its final version with all the combined features, layout fixes, and structural changes requested:
+
+1. REBRAND TO "MJ FITNESS" & PREMIUM DESIGN:
+   - Rename the application everywhere to "MJ Fitness".
+   - Use the uploaded file "Logo vermelha com fundo vermelho escuro.png" as the official logo. Place it crisply at the top of the menu/sidebar.
+   - Theme: High-end minimalist design. Main backgrounds must be clean white or ultra-light gray (`bg-white` / `bg-[#f8fafc]`). Use a premium dark crimson/burgundy accent color (inspired by the logo) exclusively for active buttons, active tab indicators, and status highlights.
+
+2. MOBILE HAMBURGER MENU & MULTI-TAB NAVIGATION:
+   - Create a sticky top navbar for mobile phones with a hamburger menu icon (three lines using Font Awesome `fa-bars`) in the top-left corner. Clicking it must smoothly slide open the sidebar navigation drawer. On desktop, this sidebar remains static on the left.
+   - Refactor the app into 2 dynamic single-page views/tabs (switching instantly without page reloads):
+     a) 👥 Alunos & Cadastro: Contains the new student form and the list of registered members.
+     b) 📊 Financeiro & Gráficos: Contains the financial metrics cards, visual chart, and cash ledger.
+
+3. UPGRADED REGISTRATION FORM (WITH CPF & PHONE):
+   - Update the SQLite database table `alunos` to include text columns for: `nome`, `cpf`, `telefone`, `plano`, `data_matricula`, `data_vencimento`, and `status`.
+   - The registration form must stack vertically on mobile (`grid-cols-1`) and require:
+     - Nome do Aluno
+     - CPF
+     - Número de Telefone
+     - Plano (Dropdown menu starting with "Plano Mensal" dynamically mapped to R$ 100,00). The value must be dynamic (not hardcoded) to support future pricing changes.
+     - Data de Matrícula
+     - Forma de Pagamento (Dropdown with emojis): 📱 Pix, 💵 Dinheiro, 💳 Cartão de Crédito, 💳 Cartão de Débito.
+   - Upon registration, an automatic initial income record of R$ 100,00 must be saved into the `historico_financeiro` table, logging the selected payment method with its emoji.
+
+4. AUTOMATED EXPIRATION & ONE-CLICK RENEWAL:
+   - Expiration Logic: Automatically calculate `data_vencimento` as exactly 1 month after registration. If the current date is past `data_vencimento`, the student's status must automatically display as "Atrasada" (in red). Otherwise, display "Em Dia" (in green).
+   - Renewal Modal: Next to each student row/card, add a "Renovar Assinatura" button. Clicking it must open a clean mobile pop-up/modal showing the plan price (R$ 100,00) and asking to select the "Forma de Pagamento" (with the same emoji options) for the new month. 
+   - Confirming the renewal must extend their `data_vencimento` by exactly 1 month, reset status to "Em Dia", and inject a new R$ 100,00 log into `historico_financeiro` with the new payment method.
+
+5. SEPARATE FINANCIAL TAB (CHART & LEDGER SPREADSHEET):
+   - At the top of the financial tab, display metrics cards for: "Faturamento Mensal (R$)", "Mensalidades Pagas", and "Mensalidades Atrasadas".
+   - Integrate a responsive Chart.js graph reading from `historico_financeiro` to display total incoming revenue over days/months.
+   - Below the chart, create a "Histórico Financeiro" spreadsheet grid showing all cash entries (Columns: Aluno, Valor [R$ 100,00], Data do Recebimento, Forma de Pagamento with emoji).
+
+6. MOBILE PROTECTION & DELETE FUNCTION:
+   - Add a functional red trash icon next to each student to permanently delete them from the database with a confirmation dialog.
+   - Layout Bug Fix: Ensure all data lists and tables use responsive Tailwind properties (like mobile card styles or `overflow-x-auto` wrappers) so that text, names, and buttons never clip, overlap, or crush on mobile phone screens.
+   - Keep the entire user interface 100% in Portuguese.

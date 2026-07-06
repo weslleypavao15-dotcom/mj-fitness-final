@@ -3,63 +3,40 @@ import { getDb } from "../lib/db";
 
 const router = Router();
 
-// GET /stats — dashboard statistics
+// GET /stats
 router.get("/stats", (_req, res) => {
   const db = getDb();
+  const today = new Date().toISOString().split("T")[0];
 
   const totalStudents = (
-    db.prepare("SELECT COUNT(*) as count FROM students").get() as { count: number }
+    db.prepare("SELECT COUNT(*) AS count FROM students").get() as { count: number }
   ).count;
 
-  const annualPlans = (
+  const activeStudents = (
     db
-      .prepare("SELECT COUNT(*) as count FROM students WHERE plan = 'Plano Anual'")
-      .get() as { count: number }
+      .prepare("SELECT COUNT(*) AS count FROM students WHERE data_vencimento >= ?")
+      .get(today) as { count: number }
   ).count;
 
-  // Active enrollments = students enrolled in the last 30 days
-  const activeEnrollments = (
+  const overdueStudents = (
     db
-      .prepare(
-        `SELECT COUNT(*) as count FROM students
-         WHERE enrollment_date >= date('now', '-30 days')`
-      )
-      .get() as { count: number }
+      .prepare("SELECT COUNT(*) AS count FROM students WHERE data_vencimento < ?")
+      .get(today) as { count: number }
   ).count;
 
-  // Monthly revenue = sum of all "Pago" payments this calendar month
+  // Monthly revenue = sum of historico entries for the current calendar month
+  const currentMonth = today.slice(0, 7); // YYYY-MM
   const monthlyRevenue = (
     db
       .prepare(
-        `SELECT COALESCE(SUM(amount), 0) as total FROM payments
-         WHERE status = 'Pago'
-           AND strftime('%Y-%m', payment_date) = strftime('%Y-%m', 'now')`
+        `SELECT COALESCE(SUM(amount), 0) AS total
+         FROM historico_financeiro
+         WHERE strftime('%Y-%m', payment_date) = ?`
       )
-      .get() as { total: number }
+      .get(currentMonth) as { total: number }
   ).total;
 
-  // Total paid payments
-  const paidCount = (
-    db
-      .prepare("SELECT COUNT(*) as count FROM payments WHERE status = 'Pago'")
-      .get() as { count: number }
-  ).count;
-
-  // Total overdue payments
-  const overdueCount = (
-    db
-      .prepare("SELECT COUNT(*) as count FROM payments WHERE status = 'Atrasado'")
-      .get() as { count: number }
-  ).count;
-
-  res.json({
-    totalStudents,
-    activeEnrollments,
-    annualPlans,
-    monthlyRevenue,
-    paidCount,
-    overdueCount,
-  });
+  res.json({ totalStudents, activeStudents, overdueStudents, monthlyRevenue });
 });
 
 export default router;

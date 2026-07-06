@@ -1,0 +1,27 @@
+Please completely upgrade the application's financial and registration logic to support dynamic plan values, select box pricing, and payment methods with emojis:
+
+1. DYNAMIC PLAN PRICING (NOT HARDCODED):
+   - Modify the student registration form so the user selects a "Plano". For now, create the option "Plano Mensal" which must be dynamically mapped to the value of R$ 100,00. 
+   - The backend and database must look up or use the value corresponding to the selected plan, instead of forcing a guaranteed static R$ 100,00 for everything. This allows for future plans with different prices.
+
+2. FORMA DE PAGAMENTO WITH EMOJIS:
+   - In the "Cadastrar Aluno" form, add a required dropdown field named "Forma de Pagamento".
+   - The dropdown options must include beautiful matching emojis exactly like this:
+     - 📱 Pix
+     - 💵 Dinheiro
+     - 💳 Cartão de Crédito
+     - 💳 Cartão de Débito
+   - When a student is registered, the automatic income entry generated in the `historico_financeiro` table must save both the dynamic value of the plan (R$ 100,00) and the selected payment method with its emoji.
+
+3. RENEWAL MODAL WITH PAYMENT METHOD:
+   - When clicking the "Renovar Assinatura" button, open a clean, mobile-friendly pop-up/modal.
+   - This modal must display the renewal price based on the student's plan (R$ 100,00) and require the user to select the "Forma de Pagamento" (with the same emoji options: 📱 Pix, 💵 Dinheiro, 💳 Cartão de Crédito, 💳 Cartão de Débito) for this new month.
+   - Upon confirmation, extend their `data_vencimento` by 1 month, reset status to "Em Dia", and insert a new log into `historico_financeiro` with the correct plan value and payment method.
+
+4. VISUAL SPREADSHEET & CHART UPDATES:
+   - The "Histórico Financeiro" spreadsheet list below the chart must display a new column for "Forma de Pagamento", showing the emoji and text clearly (e.g., Aluno | Valor | Data | Forma de Pagamento).
+   - The Chart.js graph must correctly read these dynamic values to display the overall metrics.
+
+5. UI PROTECTION:
+   - Maintain the premium minimalist branding of "MJ Fitness" (clean white backgrounds with dark crimson/burgundy accents for buttons and status indicators).
+   - Ensure all tables, selects, and text elements use responsive tailwind properties so they never clip or crush on mobile phone screens. Everything must remain 100% in Portuguese.
