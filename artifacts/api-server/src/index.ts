@@ -23,3 +23,10 @@ app.listen(port, (err) => {
 
   logger.info({ port }, "Server listening");
 });
+import app from "./app"; // Importa o app que você me mostrou anteriormente
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
